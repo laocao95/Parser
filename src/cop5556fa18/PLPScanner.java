@@ -27,11 +27,15 @@ public class PLPScanner {
 	
 	public static enum Kind {
 		IDENTIFIER, INTEGER_LITERAL, BOOLEAN_LITERAL, FLOAT_LITERAL,
+		STRING_LITERAL, CHAR_LITERAL,
 		KW_print        /* print       */,
+		KW_sleep        /* sleep       */,
 		KW_int          /* int         */,
 		KW_float        /* float       */,
 		KW_boolean      /* boolean     */,
 		KW_if           /* if          */,
+		KW_char         /* char        */,
+		KW_string       /* string      */,
 		OP_ASSIGN       /* =           */, 
 		OP_EXCLAMATION  /* !           */,
 		OP_EQ           /* ==          */,
@@ -63,7 +67,10 @@ public class PLPScanner {
 		keywordValue.put(Kind.KW_int, "int");
 		keywordValue.put(Kind.KW_float, "float");
 		keywordValue.put(Kind.KW_boolean, "boolean");
+		keywordValue.put(Kind.KW_char, "char");
+		keywordValue.put(Kind.KW_string, "char");
 		keywordValue.put(Kind.KW_if, "if");
+		keywordValue.put(Kind.KW_sleep, "sleep");
 	}
 	
 	/**
@@ -258,7 +265,7 @@ public class PLPScanner {
 		lineStarts = initLineStarts();
 	}
 	
-	private enum State {START, IN_DIGIT, IN_IDENT, HAS_EQ};  //TODO:  this is incomplete
+	private enum State {START, IN_DIGIT, IN_IDENT, HAS_EQ, IN_CHAR, IN_STRING};  //TODO:  this is incomplete
 	
 	public PLPScanner scan() throws LexicalException {
 		int pos = 0;
@@ -283,6 +290,10 @@ public class PLPScanner {
 							pos++;
 						}
 						break;
+						case ',': {
+							tokens.add(new Token(Kind.COMMA, startPos, pos - startPos + 1));
+							pos++;
+						}
 						case '+': {
 							tokens.add(new Token(Kind.OP_PLUS, startPos, pos - startPos + 1));
 							pos++;
@@ -294,10 +305,15 @@ public class PLPScanner {
 						}
 						break;
 						case '*': {
-							tokens.add(new Token(Kind.OP_TIMES, startPos, pos - startPos + 1));
-							pos++;
+							if (pos + 1 < chars.length && chars[pos + 1] == '*') {
+								tokens.add(new Token(Kind.OP_POWER, startPos, pos - startPos + 2));
+								pos = pos + 2;
+							} else {
+								tokens.add(new Token(Kind.OP_TIMES, startPos, pos - startPos + 1));
+								pos++;
+							}
 						}
-						break;
+						break;			
 						case '/': {
 							tokens.add(new Token(Kind.OP_DIV, startPos, pos - startPos + 1));
 							pos++;
@@ -308,8 +324,28 @@ public class PLPScanner {
 							pos++;
 						}
 						break;
+						case '!': {
+							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
+								tokens.add(new Token(Kind.OP_NEQ, startPos, pos - startPos + 2));
+								pos = pos + 2;
+							} else {
+								tokens.add(new Token(Kind.OP_MOD, startPos, pos - startPos + 1));
+								pos++;
+							}
+						}
+						break;
+						case '=': {
+							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
+								tokens.add(new Token(Kind.OP_EQ, startPos, pos - startPos + 2));
+								pos = pos + 2;
+							} else {
+								tokens.add(new Token(Kind.OP_ASSIGN, startPos, pos - startPos + 1));
+								pos++;
+							}
+						}
+						break;
 						case '.': {
-							if (Character.isDigit(chars[pos + 1])) {
+							if (pos + 1 < chars.length && Character.isDigit(chars[pos + 1])) {
 								state = State.IN_DIGIT;
 							} else {
 								tokens.add(new Token(Kind.DOT, startPos, pos - startPos + 1));
@@ -319,6 +355,55 @@ public class PLPScanner {
 						break;
 						case ' ': {
 							pos++;
+						}
+						break;
+						
+						case '>': {
+							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
+								tokens.add(new Token(Kind.OP_GE, startPos, pos - startPos + 2));
+								pos = pos + 2;
+							} else {
+								tokens.add(new Token(Kind.OP_GT, startPos, pos - startPos + 1));
+								pos++;
+							}
+						}
+						break;
+						case '<': {
+							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
+								tokens.add(new Token(Kind.OP_LE, startPos, pos - startPos + 2));
+								pos = pos + 2;
+							} else {
+								tokens.add(new Token(Kind.OP_LT, startPos, pos - startPos + 1));
+								pos++;
+							}
+						}
+						break;
+						case '(': {
+							tokens.add(new Token(Kind.LPAREN, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case ')': {
+							tokens.add(new Token(Kind.RPAREN, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '{': {
+							tokens.add(new Token(Kind.LBRACE, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '}': {
+							tokens.add(new Token(Kind.RBRACE, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '\'': {
+							state = State.IN_DIGIT;
+						}
+						break;
+						case '"': {
+							state = State.IN_STRING;
 						}
 						break;
 						
@@ -347,10 +432,10 @@ public class PLPScanner {
 						pos++;
 					}
 					//
-					while(pos < chars.length) {
-						if (Character.isDigit(chars[pos])) {
+					while(pos <= chars.length) {
+						if (pos != chars.length && Character.isDigit(chars[pos])) {
 							pos++;
-						} else if (chars[pos] == '.' && !ft) {
+						} else if (pos != chars.length && chars[pos] == '.' && !ft) {
 							ft = true;
 							pos++;
 						} else {
@@ -369,12 +454,13 @@ public class PLPScanner {
 				case IN_IDENT: {
 					startPos = pos;
 					pos++;
-					while(pos < chars.length) {
-						if (Character.isJavaIdentifierPart(chars[pos])) {
+					while(pos <= chars.length) {
+						if (pos != chars.length && Character.isJavaIdentifierPart(chars[pos])) {
 							pos++;
 						} else {
 							//check whether is keyword
 							boolean isKeyword = false;
+							boolean isLiteral = false;
 							String tokenstr = String.valueOf(Arrays.copyOfRange(chars, startPos, pos));
 							for (Kind key: keywordValue.keySet()) {
 								if (tokenstr == keywordValue.get(key)) {
@@ -383,18 +469,48 @@ public class PLPScanner {
 									break;
 								}
 							}
-							if (!isKeyword) {
+							if (!isKeyword && (tokenstr == "true" || tokenstr == "false")) {
+								tokens.add(new Token(Kind.BOOLEAN_LITERAL, startPos, pos - startPos));
+								isLiteral = true;
+							}
+							if (!isKeyword && !isLiteral) {
 								tokens.add(new Token(Kind.IDENTIFIER, startPos, pos - startPos));
 							}
 							state = State.START;
 							break;
 						}
 					}
-					
 				}
 				break;
-				
-				
+				case IN_CHAR: {
+					startPos = pos;
+					pos++;
+					while (pos <= chars.length) {
+						if (pos == chars.length || pos - startPos == 3) {
+							error(startPos, line(startPos), posInLine(startPos), "Char literal is not closed");
+						} else if (chars[pos] == '\'') {
+							tokens.add(new Token(Kind.CHAR_LITERAL, startPos, pos - startPos + 1));
+						} else {
+							pos++;
+						}
+					}
+				}
+				break;			
+				case IN_STRING: {
+					startPos = pos;
+					pos++;
+					while (pos <= chars.length) {
+						if (pos == chars.length) {
+							error(startPos, line(startPos), posInLine(startPos), "String literal is not closed");
+						} else if (chars[pos] == '"') {
+							tokens.add(new Token(Kind.STRING_LITERAL, startPos, pos - startPos + 1));
+							break;
+						} else {
+							pos++;
+						}
+					}
+					
+				}
 				default: {
 					error(pos, 0, 0, "undefined state");
 				}
@@ -470,20 +586,5 @@ public class PLPScanner {
 		}
 		return sb.toString();
 	}
-	
-
-//	public static ArrayList<Kind> keywordStart(char ch) {
-//		
-//		ArrayList<Kind> arr = new ArrayList<Kind>();
-//		for (Kind key : keywordValue.keySet()) {
-//			String value1 = keywordValue.get(key);
-//			if (ch == value1.charAt(0)) {
-//				arr.add(key);
-//			}
-//		}
-//		return arr;
-//	}
-
-
 
 }

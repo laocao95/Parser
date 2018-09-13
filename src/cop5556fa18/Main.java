@@ -1,5 +1,5 @@
 package cop5556fa18;
-import java.util.*;
+
 public class Main {
 
 	public Main() {
@@ -8,6 +8,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		// TODO
+		String haha = "1@#&$   +- print";
+		System.out.println(haha);
 	}
 
 }
