@@ -10,6 +10,6 @@ public class Main {
 		// TODO
 		String haha = "1@#&$   +- print";
 		System.out.println(haha);
+		double a = .123;
 	}
-
 }

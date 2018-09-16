@@ -68,7 +68,7 @@ public class PLPScanner {
 		keywordValue.put(Kind.KW_float, "float");
 		keywordValue.put(Kind.KW_boolean, "boolean");
 		keywordValue.put(Kind.KW_char, "char");
-		keywordValue.put(Kind.KW_string, "char");
+		keywordValue.put(Kind.KW_string, "string");
 		keywordValue.put(Kind.KW_if, "if");
 		keywordValue.put(Kind.KW_sleep, "sleep");
 	}
@@ -130,6 +130,7 @@ public class PLPScanner {
 			       length + "," +
 			       line + "," +
 			       posInLine(line) + "]";
+			
 		}
 
 		/**
@@ -265,7 +266,7 @@ public class PLPScanner {
 		lineStarts = initLineStarts();
 	}
 	
-	private enum State {START, IN_DIGIT, IN_IDENT, HAS_EQ, IN_CHAR, IN_STRING};  //TODO:  this is incomplete
+	private enum State {START, IN_DIGIT, IN_IDENT, HAS_EQ, IN_CHAR, IN_STRING, HAS_PC};  //TODO:  this is incomplete
 	
 	public PLPScanner scan() throws LexicalException {
 		int pos = 0;
@@ -294,6 +295,7 @@ public class PLPScanner {
 							tokens.add(new Token(Kind.COMMA, startPos, pos - startPos + 1));
 							pos++;
 						}
+						break;
 						case '+': {
 							tokens.add(new Token(Kind.OP_PLUS, startPos, pos - startPos + 1));
 							pos++;
@@ -320,8 +322,7 @@ public class PLPScanner {
 						}
 						break;
 						case '%': {
-							tokens.add(new Token(Kind.OP_MOD, startPos, pos - startPos + 1));
-							pos++;
+							state = State.HAS_PC;
 						}
 						break;
 						case '!': {
@@ -345,19 +346,22 @@ public class PLPScanner {
 						}
 						break;
 						case '.': {
-							if (pos + 1 < chars.length && Character.isDigit(chars[pos + 1])) {
-								state = State.IN_DIGIT;
-							} else {
-								tokens.add(new Token(Kind.DOT, startPos, pos - startPos + 1));
-								pos++;
-							}
+							tokens.add(new Token(Kind.DOT, startPos, pos - startPos + 1));
+							pos++;
 						}
 						break;
 						case ' ': {
 							pos++;
 						}
 						break;
-						
+						case '\n': {
+							pos++;
+						}
+						break;
+						case '\r': {
+							pos++;
+						}
+						break;
 						case '>': {
 							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
 								tokens.add(new Token(Kind.OP_GE, startPos, pos - startPos + 2));
@@ -399,7 +403,7 @@ public class PLPScanner {
 						}
 						break;
 						case '\'': {
-							state = State.IN_DIGIT;
+							state = State.IN_CHAR;
 						}
 						break;
 						case '"': {
@@ -432,17 +436,17 @@ public class PLPScanner {
 						pos++;
 					}
 					//
-					while(pos <= chars.length) {
-						if (pos != chars.length && Character.isDigit(chars[pos])) {
+					while(pos < chars.length) {
+						if (Character.isDigit(chars[pos])) {
 							pos++;
-						} else if (pos != chars.length && chars[pos] == '.' && !ft) {
+						} else if (chars[pos] == '.' && !ft) {
 							ft = true;
 							pos++;
 						} else {
 							if (ft) {
-								tokens.add(new Token(Kind.KW_float, startPos, pos - startPos));
+								tokens.add(new Token(Kind.FLOAT_LITERAL, startPos, pos - startPos));
 							} else {
-								tokens.add(new Token(Kind.KW_int, startPos, pos - startPos));
+								tokens.add(new Token(Kind.INTEGER_LITERAL, startPos, pos - startPos));
 							}
 							state = State.START;
 							break;
@@ -454,8 +458,8 @@ public class PLPScanner {
 				case IN_IDENT: {
 					startPos = pos;
 					pos++;
-					while(pos <= chars.length) {
-						if (pos != chars.length && Character.isJavaIdentifierPart(chars[pos])) {
+					while(pos < chars.length) {
+						if (chars[pos] != EOFChar && Character.isJavaIdentifierPart(chars[pos])) {
 							pos++;
 						} else {
 							//check whether is keyword
@@ -463,13 +467,13 @@ public class PLPScanner {
 							boolean isLiteral = false;
 							String tokenstr = String.valueOf(Arrays.copyOfRange(chars, startPos, pos));
 							for (Kind key: keywordValue.keySet()) {
-								if (tokenstr == keywordValue.get(key)) {
+								if (tokenstr.equals(keywordValue.get(key))) {
 									tokens.add(new Token(key, startPos, pos - startPos));
 									isKeyword = true;
 									break;
 								}
 							}
-							if (!isKeyword && (tokenstr == "true" || tokenstr == "false")) {
+							if (!isKeyword && (tokenstr.equals("true") || tokenstr.equals("false"))) {
 								tokens.add(new Token(Kind.BOOLEAN_LITERAL, startPos, pos - startPos));
 								isLiteral = true;
 							}
@@ -485,11 +489,14 @@ public class PLPScanner {
 				case IN_CHAR: {
 					startPos = pos;
 					pos++;
-					while (pos <= chars.length) {
-						if (pos == chars.length || pos - startPos == 3) {
+					while (pos < chars.length) {
+						if (chars[pos] == EOFChar || pos - startPos == 3) {
 							error(startPos, line(startPos), posInLine(startPos), "Char literal is not closed");
 						} else if (chars[pos] == '\'') {
 							tokens.add(new Token(Kind.CHAR_LITERAL, startPos, pos - startPos + 1));
+							pos++;
+							state = State.START;
+							break;
 						} else {
 							pos++;
 						}
@@ -499,11 +506,13 @@ public class PLPScanner {
 				case IN_STRING: {
 					startPos = pos;
 					pos++;
-					while (pos <= chars.length) {
-						if (pos == chars.length) {
+					while (pos < chars.length) {
+						if (chars[pos] == EOFChar) {
 							error(startPos, line(startPos), posInLine(startPos), "String literal is not closed");
 						} else if (chars[pos] == '"') {
 							tokens.add(new Token(Kind.STRING_LITERAL, startPos, pos - startPos + 1));
+							pos++;
+							state = State.START;					
 							break;
 						} else {
 							pos++;
@@ -511,6 +520,29 @@ public class PLPScanner {
 					}
 					
 				}
+				break;
+				case HAS_PC: {
+					startPos = pos;
+					pos++;
+					if (chars[pos] == '{') {
+						while(pos < chars.length) {
+							if (chars[pos] != EOFChar && chars[pos] != '%' && chars[pos + 1] != '}') {
+								pos++;
+							} else if (chars[pos] != EOFChar && chars[pos] == '%' && chars[pos + 1] == '}') {
+								pos = pos + 2;
+								state = State.START;
+								break;
+							} else {
+								error(startPos, line(startPos), posInLine(startPos), "Comments is not closed");
+								break;
+							}
+						}
+					} else {
+						tokens.add(new Token(Kind.OP_MOD, startPos, pos - startPos));
+						state = State.START;
+					}
+				}
+				break;
 				default: {
 					error(pos, 0, 0, "undefined state");
 				}

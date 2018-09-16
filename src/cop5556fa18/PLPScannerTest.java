@@ -7,6 +7,11 @@ package cop5556fa18;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -90,14 +95,14 @@ public class PLPScannerTest {
 		 *   
 		 * @throws LexicalException
 		 */
-		@Test
-		public void testEmpty() throws LexicalException {
-			String input = "";  //The input is the empty string.  This is legal
-			show(input);        //Display the input 
-			PLPScanner scanner = new PLPScanner(input).scan();  //Create a Scanner and initialize it
-			show(scanner);   //Display the Scanner
-			checkNextIsEOF(scanner);  //Check that the only token is the EOF token.
-		}
+//		@Test
+//		public void testEmpty() throws LexicalException {
+//			String input = "";  //The input is the empty string.  This is legal
+//			show(input);        //Display the input 
+//			PLPScanner scanner = new PLPScanner(input).scan();  //Create a Scanner and initialize it
+//			show(scanner);   //Display the Scanner
+//			checkNextIsEOF(scanner);  //Check that the only token is the EOF token.
+//		}
 
 		
 		/**
@@ -114,22 +119,50 @@ public class PLPScannerTest {
 		 * 
 		 * @throws LexicalException
 		 */
+//		@Test
+//		public void failIllegalChar() throws LexicalException {
+//			String input = ";;~";
+//			show(input);
+//			thrown.expect(LexicalException.class);  //Tell JUnit to expect a LexicalException
+//			try {
+//				new PLPScanner(input).scan();
+//			} catch (LexicalException e) {  //Catch the exception
+//				show(e);                    //Display it
+//				assertEquals(2,e.getPos()); //Check that it occurred in the expected position
+//				throw e;                    //Rethrow exception so JUnit will see it
+//			}
+//		}
+//		
+		
+//		@Test
+//		public void testNormal() throws LexicalException {
+//			try {
+//				String input = "char abc = c\nhaha";  //The input is the empty string.  This is legal
+//				show(input);        //Display the input 
+//				PLPScanner scanner = new PLPScanner(input).scan();  //Create a Scanner and initialize it
+//				show(scanner);   //Display the Scanner
+//				//checkNextIsEOF(scanner);  //Check that the only token is the EOF token.
+//			} catch (LexicalException e) {
+//				show(e);
+//				//throw e;
+//			}
+//
+//		}
+		
+		
 		@Test
-		public void failIllegalChar() throws LexicalException {
-			String input = ";;~";
-			show(input);
-			thrown.expect(LexicalException.class);  //Tell JUnit to expect a LexicalException
-			try {
-				new PLPScanner(input).scan();
-			} catch (LexicalException e) {  //Catch the exception
-				show(e);                    //Display it
-				assertEquals(2,e.getPos()); //Check that it occurred in the expected position
-				throw e;                    //Rethrow exception so JUnit will see it
-			}
+		public void testReadFile() throws LexicalException {
+		    Path path = Paths.get(".", "test.txt");
+		    try {
+		        String input = new String(Files.readAllBytes(path));
+		        PLPScanner scanner = new PLPScanner(input).scan();
+		        show(scanner);
+		    } catch (java.io.IOException e) {
+		        System.out.println("IO ERROR:" + e);
+		    }
 		}
 		
 		/**
 		 * Using the two previous functions as a template.  You can implement other JUnit test cases.
-		 * /
-		
+		 */
 }
