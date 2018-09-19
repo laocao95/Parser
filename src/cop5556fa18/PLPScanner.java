@@ -1,9 +1,10 @@
 /**
 * Initial code for the Scanner
 */
-
 package cop5556fa18;
-
+/*
+ * Name: Zhiwei Cao    id:50945378   P2
+ * */
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -414,8 +415,12 @@ public class PLPScanner {
 						default: {
 							// check digit
 							if (Character.isDigit(ch)) {
+								
+								if (ch == '0' && Character.isDigit(chars[pos + 1])) {
+									error(startPos, line(startPos), posInLine(startPos), "number literal should not start at 0");
+								}
 								state = State.IN_DIGIT;
-							} else if (Character.isJavaIdentifierStart(ch)) {													
+							} else if (Character.isJavaIdentifierStart(ch)) {
 							// check Identifier
 								state = State.IN_IDENT;
 								
@@ -444,8 +449,18 @@ public class PLPScanner {
 							pos++;
 						} else {
 							if (ft) {
+								try {
+									Float.valueOf(String.copyValueOf(chars, startPos, pos - startPos));
+								} catch (Exception e) {
+									error(startPos, line(startPos), posInLine(startPos), "Float is out of range");
+								}
 								tokens.add(new Token(Kind.FLOAT_LITERAL, startPos, pos - startPos));
 							} else {
+								try {
+									Integer.valueOf(String.copyValueOf(chars, startPos, pos - startPos));
+								} catch (Exception e) {
+									error(startPos, line(startPos), posInLine(startPos), "Integer is out of range");
+								}
 								tokens.add(new Token(Kind.INTEGER_LITERAL, startPos, pos - startPos));
 							}
 							state = State.START;
@@ -526,7 +541,7 @@ public class PLPScanner {
 					pos++;
 					if (chars[pos] == '{') {
 						while(pos < chars.length) {
-							if (chars[pos] != EOFChar && chars[pos] != '%' && chars[pos + 1] != '}') {
+							if ((chars[pos] != EOFChar && !(chars[pos] == '%' && chars[pos + 1] == '}')) || (chars[pos] != EOFChar && !(chars[pos] == '%' && chars[pos + 1] == '{'))) {
 								pos++;
 							} else if (chars[pos] != EOFChar && chars[pos] == '%' && chars[pos + 1] == '}') {
 								pos = pos + 2;

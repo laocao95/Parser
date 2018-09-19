@@ -119,48 +119,112 @@ public class PLPScannerTest {
 		 * 
 		 * @throws LexicalException
 		 */
-//		@Test
-//		public void failIllegalChar() throws LexicalException {
-//			String input = ";;~";
-//			show(input);
-//			thrown.expect(LexicalException.class);  //Tell JUnit to expect a LexicalException
-//			try {
-//				new PLPScanner(input).scan();
-//			} catch (LexicalException e) {  //Catch the exception
-//				show(e);                    //Display it
-//				assertEquals(2,e.getPos()); //Check that it occurred in the expected position
-//				throw e;                    //Rethrow exception so JUnit will see it
-//			}
-//		}
-//		
-		
-//		@Test
-//		public void testNormal() throws LexicalException {
-//			try {
-//				String input = "char abc = c\nhaha";  //The input is the empty string.  This is legal
-//				show(input);        //Display the input 
-//				PLPScanner scanner = new PLPScanner(input).scan();  //Create a Scanner and initialize it
-//				show(scanner);   //Display the Scanner
-//				//checkNextIsEOF(scanner);  //Check that the only token is the EOF token.
-//			} catch (LexicalException e) {
-//				show(e);
-//				//throw e;
-//			}
-//
-//		}
+		@Test
+		public void failIllegalChar() throws LexicalException {
+			String input = ";;~";
+			show(input);
+			thrown.expect(LexicalException.class);  //Tell JUnit to expect a LexicalException
+			try {
+				new PLPScanner(input).scan();
+			} catch (LexicalException e) {  //Catch the exception
+				show(e);                    //Display it
+				assertEquals(2,e.getPos()); //Check that it occurred in the expected position
+				throw e;                    //Rethrow exception so JUnit will see it
+			}
+		}
 		
 		
 		@Test
-		public void testReadFile() throws LexicalException {
-		    Path path = Paths.get(".", "test.txt");
+		public void testNormal() throws LexicalException {
+			try {
+				String input = "";  //The input is the empty string.  This is legal
+				show(input);        //Display the input 
+				PLPScanner scanner = new PLPScanner(input).scan();  //Create a Scanner and initialize it
+				show(scanner);   //Display the Scanner
+				//checkNextIsEOF(scanner);  //Check that the only token is the EOF token.
+			} catch (LexicalException e) {
+				show(e);
+				//throw e;
+			}
+
+		}
+		
+//		@Test
+//		public void testReadFile() throws LexicalException {
+//		    Path path = Paths.get(".", "test.txt");
+//		    try {
+//		        String input = new String(Files.readAllBytes(path));
+//		        PLPScanner scanner = new PLPScanner(input).scan();
+//		        show(scanner);
+//		    } catch (java.io.IOException e) {
+//		        System.out.println("IO ERROR:" + e);
+//		    }
+//		}
+//		
+		@Test
+		public void testSampleInDoc() throws LexicalException {
+			String input = "boolean a;\r\n" +
+			"int b, x, y;\r\n" +
+			"char c;\r\n" + 
+			"float d, t;\r\n" +
+			"string e;\r\n" + 
+			"\r\n" +
+			"a = true;\r\n" +
+			"B = 10;\r\n" +
+			"c = 'a';\r\n" +
+			"d = 23.2;\r\n" +
+			"e = \"Hello, World!\";\r\n" +
+			"\r\n" +
+			"a = 1+2;\r\n" +
+			"d = 2.12 - 1;\r\n" +
+			"a == 3;\r\n" +
+			"a = 1 + 2 * 4.5;\r\n" +
+			"t = (1+2) * 4.5;\r\n" +
+			"t = (((4-2)*5.6)/3)+2;\r\n" +
+			"\r\n" +
+			"int score = 100;\r\n" +
+			"\r\n" +
+			"if (a == 100) {\r\n" +
+			"    print (\"Value of a is 100\");\r\n" +
+			"}\r\n" +
+			"if (score > 100) {\r\n" +
+			"    print (a);\r\n" +
+			"}";
+			
 		    try {
-		        String input = new String(Files.readAllBytes(path));
 		        PLPScanner scanner = new PLPScanner(input).scan();
 		        show(scanner);
-		    } catch (java.io.IOException e) {
-		        System.out.println("IO ERROR:" + e);
+		    } catch (LexicalException e) {
+		        show(e);
 		    }
 		}
+		
+		@Test
+		public void testOverflow() throws LexicalException {
+			thrown.expect(LexicalException.class);
+		    try {
+		        String input = new String("int a = 1000000000000000000000000000001");
+		        PLPScanner scanner = new PLPScanner(input).scan();
+		        show(scanner);
+		    } catch (LexicalException e) {
+		    	show(e);
+		    	throw e;
+		    }
+		}
+		
+		@Test
+		public void testNorParent() throws LexicalException {
+			thrown.expect(LexicalException.class);
+		    try {
+		        String input = new String("string a = \"123;");
+		        PLPScanner scanner = new PLPScanner(input).scan();
+		        show(scanner);
+		    } catch (LexicalException e) {
+		    	show(e);
+		    	throw e;
+		    }
+		}
+		
 		
 		/**
 		 * Using the two previous functions as a template.  You can implement other JUnit test cases.
