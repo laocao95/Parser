@@ -190,7 +190,6 @@ public class PLPScannerTest {
 			"if (score > 100) {\r\n" +
 			"    print (a);\r\n" +
 			"}";
-			
 		    try {
 		        PLPScanner scanner = new PLPScanner(input).scan();
 		        show(scanner);

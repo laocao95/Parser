@@ -346,11 +346,11 @@ public class PLPScanner {
 							}
 						}
 						break;
-						case '.': {
-							tokens.add(new Token(Kind.DOT, startPos, pos - startPos + 1));
-							pos++;
-						}
-						break;
+//						case '.': {
+//							tokens.add(new Token(Kind.DOT, startPos, pos - startPos + 1));
+//							pos++;
+//						}
+//						break;
 						case ' ': {
 							pos++;
 						}
@@ -417,9 +417,12 @@ public class PLPScanner {
 							if (Character.isDigit(ch)) {
 								
 								if (ch == '0' && Character.isDigit(chars[pos + 1])) {
-									error(startPos, line(startPos), posInLine(startPos), "number literal should not start at 0");
+									tokens.add(new Token(Kind.INTEGER_LITERAL, startPos, pos - startPos + 1));
+									pos++;
+									//error(startPos, line(startPos), posInLine(startPos), "number literal should not start at 0");
+								} else {
+									state = State.IN_DIGIT;
 								}
-								state = State.IN_DIGIT;
 							} else if (Character.isJavaIdentifierStart(ch)) {
 							// check Identifier
 								state = State.IN_IDENT;
@@ -436,19 +439,21 @@ public class PLPScanner {
 				case IN_DIGIT: {
 					boolean ft = false;
 					startPos = pos;
-					if (ch == '.') {
-						ft = true;
-						pos++;
-					}
-					//
 					while(pos < chars.length) {
 						if (Character.isDigit(chars[pos])) {
 							pos++;
+							
 						} else if (chars[pos] == '.' && !ft) {
-							ft = true;
-							pos++;
+							if (Character.isDigit(chars[pos + 1])) {
+								ft = true;
+								pos++;
+							} else {
+								error(pos, line(pos), posInLine(pos), "illegal char");
+							}
+
 						} else {
 							if (ft) {
+								//test whether overflow
 								try {
 									Float.valueOf(String.copyValueOf(chars, startPos, pos - startPos));
 								} catch (Exception e) {
