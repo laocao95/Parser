@@ -416,7 +416,7 @@ public class PLPScanner {
 							// check digit
 							if (Character.isDigit(ch)) {
 								
-								if (ch == '0' && Character.isDigit(chars[pos + 1])) {
+								if (ch == '0' && chars[pos + 1] != '.') {
 									tokens.add(new Token(Kind.INTEGER_LITERAL, startPos, pos - startPos + 1));
 									pos++;
 									//error(startPos, line(startPos), posInLine(startPos), "number literal should not start at 0");
