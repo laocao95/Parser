@@ -35,16 +35,25 @@ public class PLPScanner {
 		KW_float        /* float       */,
 		KW_boolean      /* boolean     */,
 		KW_if           /* if          */,
+		KW_while 		/* while 	   */,
 		KW_char         /* char        */,
 		KW_string       /* string      */,
+		KW_abs			/* abs 		   */,
+		KW_sin			/* sin 		   */,
+		KW_cos			/* cos 		   */, 
+		KW_atan			/* atan        */,
+		KW_log			/* log 		   */,
 		OP_ASSIGN       /* =           */, 
 		OP_EXCLAMATION  /* !           */,
+		OP_QUESTION		/* ? 		   */,
 		OP_EQ           /* ==          */,
 		OP_NEQ          /* !=          */, 
 		OP_GE           /* >=          */,
 		OP_LE           /* <=          */,
 		OP_GT           /* >           */,
 		OP_LT           /* <           */,
+		OP_AND			/* & 		   */, 
+		OP_OR			/* | 		   */,
 		OP_PLUS         /* +           */,
 		OP_MINUS        /* -           */,
 		OP_TIMES        /* *           */,
@@ -55,7 +64,10 @@ public class PLPScanner {
 		RPAREN          /* )           */,
 		LBRACE          /* {           */, 
 		RBRACE          /* }           */,
+		LSQUARE			/* [           */, 
+		RSQUARE			/* ]           */, 
 		SEMI            /* ;           */,
+		OP_COLON		/* : 		   */,
 		COMMA           /* ,           */,
 		DOT             /* .           */,
 		EOF;            /* end of file */
@@ -72,6 +84,13 @@ public class PLPScanner {
 		keywordValue.put(Kind.KW_string, "string");
 		keywordValue.put(Kind.KW_if, "if");
 		keywordValue.put(Kind.KW_sleep, "sleep");
+		keywordValue.put(Kind.KW_while, "while");
+		keywordValue.put(Kind.KW_abs, "while");
+		keywordValue.put(Kind.KW_sin, "while");
+		keywordValue.put(Kind.KW_cos, "while");
+		keywordValue.put(Kind.KW_atan, "while");
+		keywordValue.put(Kind.KW_log, "while");
+		
 	}
 	
 	/**
@@ -331,7 +350,7 @@ public class PLPScanner {
 								tokens.add(new Token(Kind.OP_NEQ, startPos, pos - startPos + 2));
 								pos = pos + 2;
 							} else {
-								tokens.add(new Token(Kind.OP_MOD, startPos, pos - startPos + 1));
+								tokens.add(new Token(Kind.OP_EXCLAMATION, startPos, pos - startPos + 1));
 								pos++;
 							}
 						}
@@ -411,6 +430,36 @@ public class PLPScanner {
 							state = State.IN_STRING;
 						}
 						break;
+						case '?': {
+							tokens.add(new Token(Kind.OP_QUESTION, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '&': {
+							tokens.add(new Token(Kind.OP_AND, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '|': {
+							tokens.add(new Token(Kind.OP_OR, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case ':': {
+							tokens.add(new Token(Kind.OP_COLON, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case '[': {
+							tokens.add(new Token(Kind.LSQUARE, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
+						case ']': {
+							tokens.add(new Token(Kind.RSQUARE, startPos, pos - startPos + 1));
+							pos++;
+						}
+						break;
 						
 						default: {
 							// check digit
@@ -423,7 +472,7 @@ public class PLPScanner {
 								} else {
 									state = State.IN_DIGIT;
 								}
-							} else if (Character.isJavaIdentifierStart(ch)) {
+							} else if (Character.isJavaIdentifierStart(ch) && ch != '$') {
 							// check Identifier
 								state = State.IN_IDENT;
 								
@@ -479,7 +528,7 @@ public class PLPScanner {
 					startPos = pos;
 					pos++;
 					while(pos < chars.length) {
-						if (chars[pos] != EOFChar && Character.isJavaIdentifierPart(chars[pos])) {
+						if (chars[pos] != EOFChar && chars[pos] != '$' && Character.isJavaIdentifierPart(chars[pos])) {
 							pos++;
 						} else {
 							//check whether is keyword
@@ -498,7 +547,19 @@ public class PLPScanner {
 								isLiteral = true;
 							}
 							if (!isKeyword && !isLiteral) {
-								tokens.add(new Token(Kind.IDENTIFIER, startPos, pos - startPos));
+								boolean flag = false;
+								for (int i = startPos; i < pos; i++) {
+									if (chars[i] != '_') {
+										flag = true;
+										break;
+									}
+								}
+								if (flag) {
+									tokens.add(new Token(Kind.IDENTIFIER, startPos, pos - startPos));
+								} else {
+									error(startPos, line(startPos), posInLine(startPos), "illegal identifier");
+								}
+								
 							}
 							state = State.START;
 							break;
@@ -524,6 +585,7 @@ public class PLPScanner {
 				}
 				break;			
 				case IN_STRING: {
+					System.out.println("enter string");
 					startPos = pos;
 					pos++;
 					while (pos < chars.length) {
@@ -542,16 +604,20 @@ public class PLPScanner {
 				}
 				break;
 				case HAS_PC: {
+					System.out.println("enter comment");
 					startPos = pos;
 					pos++;
 					if (chars[pos] == '{') {
 						while(pos < chars.length) {
-							if ((chars[pos] != EOFChar && !(chars[pos] == '%' && chars[pos + 1] == '}')) || (chars[pos] != EOFChar && !(chars[pos] == '%' && chars[pos + 1] == '{'))) {
-								pos++;
-							} else if (chars[pos] != EOFChar && chars[pos] == '%' && chars[pos + 1] == '}') {
+							if (chars[pos] != EOFChar && chars[pos] == '%' && chars[pos + 1] == '}') {
 								pos = pos + 2;
 								state = State.START;
 								break;
+							} else if (chars[pos] != EOFChar && chars[pos] == '%' && chars[pos + 1] == '{') {
+								error(startPos, line(startPos), posInLine(startPos), "Comments is not closed");
+								break;
+							} else if (chars[pos] != EOFChar) {
+								pos++;
 							} else {
 								error(startPos, line(startPos), posInLine(startPos), "Comments is not closed");
 								break;
