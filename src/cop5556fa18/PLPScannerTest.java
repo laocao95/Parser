@@ -161,42 +161,42 @@ public class PLPScannerTest {
 //		    }
 //		}
 //		
-		@Test
-		public void testSampleInDoc() throws LexicalException {
-			String input = "boolean a;\r\n" +
-			"int b, x, y;\r\n" +
-			"char c;\r\n" + 
-			"float d, t;\r\n" +
-			"string e;\r\n" + 
-			"\r\n" +
-			"a = true;\r\n" +
-			"B = 10;\r\n" +
-			"c = 'a';\r\n" +
-			"d = 23.2;\r\n" +
-			"e = \"Hello, World!\";\r\n" +
-			"\r\n" +
-			"a = 1+2;\r\n" +
-			"d = 2.12 - 1;\r\n" +
-			"a == 3;\r\n" +
-			"a = 1 + 2 * 4.5;\r\n" +
-			"t = (1+2) * 4.5;\r\n" +
-			"t = (((4-2)*5.6)/3)+2;\r\n" +
-			"\r\n" +
-			"int score = 100;\r\n" +
-			"\r\n" +
-			"if (a == 100) {\r\n" +
-			"    print (\"Value of a is 100\");\r\n" +
-			"}\r\n" +
-			"if (score > 100) {\r\n" +
-			"    print (a);\r\n" +
-			"}";
-		    try {
-		        PLPScanner scanner = new PLPScanner(input).scan();
-		        show(scanner);
-		    } catch (LexicalException e) {
-		        show(e);
-		    }
-		}
+//		@Test
+//		public void testSampleInDoc() throws LexicalException {
+//			String input = "boolean a;\r\n" +
+//			"int b, x, y;\r\n" +
+//			"char c;\r\n" + 
+//			"float d, t;\r\n" +
+//			"string e;\r\n" + 
+//			"\r\n" +
+//			"a = true;\r\n" +
+//			"B = 10;\r\n" +
+//			"c = 'a';\r\n" +
+//			"d = 23.2;\r\n" +
+//			"e = \"Hello, World!\";\r\n" +
+//			"\r\n" +
+//			"a = 1+2;\r\n" +
+//			"d = 2.12 - 1;\r\n" +
+//			"a == 3;\r\n" +
+//			"a = 1 + 2 * 4.5;\r\n" +
+//			"t = (1+2) * 4.5;\r\n" +
+//			"t = (((4-2)*5.6)/3)+2;\r\n" +
+//			"\r\n" +
+//			"int score = 100;\r\n" +
+//			"\r\n" +
+//			"if (a == 100) {\r\n" +
+//			"    print (\"Value of a is 100\");\r\n" +
+//			"}\r\n" +
+//			"if (score > 100) {\r\n" +
+//			"    print (a);\r\n" +
+//			"}";
+//		    try {
+//		        PLPScanner scanner = new PLPScanner(input).scan();
+//		        show(scanner);
+//		    } catch (LexicalException e) {
+//		        show(e);
+//		    }
+//		}
 		
 //		@Test
 //		public void testOverflow() throws LexicalException {
@@ -215,8 +215,9 @@ public class PLPScannerTest {
 		public void testNorParent() throws LexicalException {
 			//thrown.expect(LexicalException.class);
 		    try {
-		        String input = new String("___a");
+		        String input = new String("1231231233333333333333333333");
 		        PLPScanner scanner = new PLPScanner(input).scan();
+		        show(input);
 		        show(scanner);
 		    } catch (LexicalException e) {
 		    	show(e);

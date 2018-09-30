@@ -65,7 +65,7 @@ public class PLPParserTest {
 		//This test will fail in the starter code. However, it should pass in a complete parser.
 		@Test
 		public void testDec0() throws LexicalException, SyntaxException {
-			String input = "b{int c;}";
+			String input = "b{int c, b;}";
 			PLPParser parser = makeParser(input);
 			parser.parse();
 		}
