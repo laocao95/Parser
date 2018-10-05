@@ -160,7 +160,7 @@ public class PLPScannerTest {
 //		        System.out.println("IO ERROR:" + e);
 //		    }
 //		}
-//		
+		
 //		@Test
 //		public void testSampleInDoc() throws LexicalException {
 //			String input = "boolean a;\r\n" +
@@ -215,7 +215,7 @@ public class PLPScannerTest {
 		public void testNorParent() throws LexicalException {
 			//thrown.expect(LexicalException.class);
 		    try {
-		        String input = new String("1231231233333333333333333333");
+		        String input = new String("[abc]");
 		        PLPScanner scanner = new PLPScanner(input).scan();
 		        show(input);
 		        show(scanner);
@@ -224,7 +224,7 @@ public class PLPScannerTest {
 		    	throw e;
 		    }
 		}
-		
+//		
 		
 		/**
 		 * Using the two previous functions as a template.  You can implement other JUnit test cases.

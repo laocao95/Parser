@@ -85,11 +85,11 @@ public class PLPScanner {
 		keywordValue.put(Kind.KW_if, "if");
 		keywordValue.put(Kind.KW_sleep, "sleep");
 		keywordValue.put(Kind.KW_while, "while");
-		keywordValue.put(Kind.KW_abs, "while");
-		keywordValue.put(Kind.KW_sin, "while");
-		keywordValue.put(Kind.KW_cos, "while");
-		keywordValue.put(Kind.KW_atan, "while");
-		keywordValue.put(Kind.KW_log, "while");
+		keywordValue.put(Kind.KW_abs, "abs");
+		keywordValue.put(Kind.KW_sin, "sin");
+		keywordValue.put(Kind.KW_cos, "cos");
+		keywordValue.put(Kind.KW_atan, "atan");
+		keywordValue.put(Kind.KW_log, "log");
 		
 	}
 	
@@ -604,7 +604,6 @@ public class PLPScanner {
 				}
 				break;
 				case HAS_PC: {
-					System.out.println("enter comment");
 					startPos = pos;
 					pos++;
 					if (chars[pos] == '{') {

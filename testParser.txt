@@ -1,0 +1,30 @@
+testProgram {
+string i, j ,k;
+boolean bl = false;
+%{test if statement, there's a ; after while statement%}
+if (a==b) {print a;};
+
+%{test while statement, there's a ; after while statement%}
+while (a==b) {print a;};
+
+%{test assignment statement%}
+_sth = a;
+
+%{test sleep statement, 
+don't know why there's a statement after sleep%}
+sleep test;
+
+%{test print statement%}
+print a;
+
+%{test expressions%}
+test = a == b ? a | b : c & (d <= a) * 0.089**(a-b) + 3 / 4;
+
+%{test function%}
+a = sin(a+b);
+a = cos(a*b/3);
+a = atan(a_);
+a = abs(test);
+a = log(test)**int(test) != float(test);
+
+}

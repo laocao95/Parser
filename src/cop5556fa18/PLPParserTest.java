@@ -1,5 +1,10 @@
 package cop5556fa18;
 
+import java.io.SyncFailedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,7 +37,7 @@ public class PLPParserTest {
 			show(scanner);
 			PLPParser parser = new PLPParser(scanner);
 			return parser;
-		}	
+		}
 
 		/**
 		 * An empty program.  This throws an exception because it lacks an identifier and a block. 
@@ -70,5 +75,24 @@ public class PLPParserTest {
 			parser.parse();
 		}
 		
+		
+//		@Test
+//		public void testReadFile() throws LexicalException, SyntaxException {
+//		    Path path = Paths.get(".", "testParser.txt");
+//		    try {
+//		        String input = new String(Files.readAllBytes(path));
+//		        PLPParser parser = makeParser(input);
+//		        parser.parse();
+//		    } catch (java.io.IOException e) {
+//		        System.out.println("IO ERROR:" + e);
+//		    } catch (LexicalException e) {
+//		    	show(e);
+//		    	throw(e);
+//		    } catch (SyntaxException e) {
+//		    	show(e);
+//		    	show(e.t);
+//		    	throw(e);
+//		    }
+//		}
 
 }
