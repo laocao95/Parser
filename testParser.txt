@@ -20,11 +20,18 @@ print a;
 %{test expressions%}
 test = a == b ? a | b : c & (d <= a) * 0.089**(a-b) + 3 / 4;
 
+
 %{test function%}
 a = sin(a+b);
 a = cos(a*b/3);
 a = atan(a_);
 a = abs(test);
 a = log(test)**int(test) != float(test);
+
+
+int a = 2*3+5 == c ? sin(x)**4 : log(y)%10;
+float a, b, c, d;
+boolean a = x < z & 3 + 5 / int(z) >= 0 | !atan(t);
+if(z == 0) {int x = 3+5-8*x*y/r**abs(c)**cos(3);};
 
 }

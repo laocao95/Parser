@@ -3,7 +3,7 @@
 */
 package cop5556fa18;
 /*
- * Name: Zhiwei Cao    id:50945378   P2
+ * Name: Zhiwei Cao    id:50945378   P4
  * */
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -503,9 +503,7 @@ public class PLPScanner {
 						} else {
 							if (ft) {
 								//test whether overflow
-								try {
-									Float.valueOf(String.copyValueOf(chars, startPos, pos - startPos));
-								} catch (Exception e) {
+								if (Float.parseFloat(String.copyValueOf(chars, startPos, pos - startPos)) > Float.MAX_VALUE) {
 									error(startPos, line(startPos), posInLine(startPos), "Float is out of range");
 								}
 								tokens.add(new Token(Kind.FLOAT_LITERAL, startPos, pos - startPos));

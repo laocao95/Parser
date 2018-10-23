@@ -213,7 +213,7 @@ public class PLPScannerTest {
 		
 		@Test
 		public void testNorParent() throws LexicalException {
-			//thrown.expect(LexicalException.class);
+			//thrown.expect(LexicalException.class); 
 		    try {
 		        String input = new String("[abc]");
 		        PLPScanner scanner = new PLPScanner(input).scan();
@@ -224,6 +224,9 @@ public class PLPScannerTest {
 		    	throw e;
 		    }
 		}
+		
+		
+		
 //		
 		
 		/**
