@@ -149,17 +149,17 @@ public class PLPScannerTest {
 //
 //		}
 		
-//		@Test
-//		public void testReadFile() throws LexicalException {
-//		    Path path = Paths.get(".", "test.txt");
-//		    try {
-//		        String input = new String(Files.readAllBytes(path));
-//		        PLPScanner scanner = new PLPScanner(input).scan();
-//		        show(scanner);
-//		    } catch (java.io.IOException e) {
-//		        System.out.println("IO ERROR:" + e);
-//		    }
-//		}
+		@Test
+		public void testReadFile() throws LexicalException {
+		    Path path = Paths.get(".", "test.txt");
+		    try {
+		        String input = new String(Files.readAllBytes(path));
+		        PLPScanner scanner = new PLPScanner(input).scan();
+		        show(scanner);
+		    } catch (java.io.IOException e) {
+		        System.out.println("IO ERROR:" + e);
+		    }
+		}
 		
 //		@Test
 //		public void testSampleInDoc() throws LexicalException {
@@ -211,20 +211,20 @@ public class PLPScannerTest {
 //		    }
 //		}
 		
-		@Test
-		public void testNorParent() throws LexicalException {
-			//thrown.expect(LexicalException.class); 
-		    try {
-		        String input = new String("[abc]");
-		        PLPScanner scanner = new PLPScanner(input).scan();
-		        show(input);
-		        show(scanner);
-		    } catch (LexicalException e) {
-		    	show(e);
-		    	throw e;
-		    }
-		}
-		
+//		@Test
+//		public void testNorParent() throws LexicalException {
+//			//thrown.expect(LexicalException.class); 
+//		    try {
+//		        String input = new String("[abc]");
+//		        PLPScanner scanner = new PLPScanner(input).scan();
+//		        show(input);
+//		        show(scanner);
+//		    } catch (LexicalException e) {
+//		    	show(e);
+//		    	throw e;
+//		    }
+//		}
+//		
 		
 		
 //		

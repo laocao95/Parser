@@ -1,7 +1,6 @@
 package cop5556fa18;
 
 import cop5556fa18.PLPScanner.Token;
-import javafx.scene.control.TabPane.TabClosingPolicy;
 import cop5556fa18.PLPScanner.Kind;
 
 import java.util.ArrayList;
@@ -70,7 +69,7 @@ public class PLPParser {
 		List<PLPASTNode> nodeList = new ArrayList<>();
 		
 		match(Kind.LBRACE);
-		
+	
 		while (checkKind(firstDec) | checkKind(firstStatement)) {
 			
 			if (checkKind(firstDec)) {
@@ -120,7 +119,6 @@ public class PLPParser {
 	}
 	
 	public Statement statement() throws SyntaxException {
-		//TODO
 		Statement s = null;
 		Token firstToken = t;
 		
@@ -148,7 +146,8 @@ public class PLPParser {
 				match(Kind.IDENTIFIER);
 				match(Kind.OP_ASSIGN);
 				Expression e = expression();
-				s = new AssignmentStatement(firstToken, name, e);
+				LHS lhs = new LHS(firstToken, name);
+				s = new AssignmentStatement(firstToken, lhs, e);
 			}
 			break;
 			case KW_sleep: {
@@ -408,7 +407,6 @@ public class PLPParser {
 	}
 	
 
-	//TODO Complete all other productions
 
 	protected boolean checkKind(Kind kind) {
 		return t.kind == kind;

@@ -7,12 +7,20 @@ public class VariableDeclaration extends Declaration {
 	public final Kind type;
 	public final String name;
 	public final Expression expression;
+	public int slot;
 	
 	public VariableDeclaration(Token firstToken, Kind type, String name, Expression expression) {
 		super(firstToken);
 		this.type = type;
 		this.name = name;
 		this.expression = expression;
+	}
+	
+	public int getSlot() {
+		return slot;
+	}
+	public void setSlot(int slot) {
+		this.slot = slot;
 	}
 
 	@Override

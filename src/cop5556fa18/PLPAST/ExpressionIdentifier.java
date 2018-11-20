@@ -5,7 +5,7 @@ import cop5556fa18.PLPScanner.Token;
 public class ExpressionIdentifier extends Expression {
 	
 	public final String name;
-
+	public Declaration dec;
 	public ExpressionIdentifier(Token firstToken, String name) {
 		super(firstToken);
 		this.name = name;

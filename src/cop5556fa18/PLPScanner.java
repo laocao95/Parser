@@ -382,6 +382,10 @@ public class PLPScanner {
 							pos++;
 						}
 						break;
+						case '\t': {
+							pos++;
+						}
+						break;
 						case '>': {
 							if (pos + 1 < chars.length && chars[pos + 1] == '=') {
 								tokens.add(new Token(Kind.OP_GE, startPos, pos - startPos + 2));

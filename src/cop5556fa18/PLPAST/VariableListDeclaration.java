@@ -1,5 +1,6 @@
 package cop5556fa18.PLPAST;
 
+import java.util.HashMap;
 import java.util.List;
 
 import cop5556fa18.PLPScanner.Kind;
@@ -8,6 +9,7 @@ import cop5556fa18.PLPScanner.Token;
 public class VariableListDeclaration extends Declaration {
 	public final Kind type;
 	public final List<String> names;
+	public HashMap<String, Integer> slotmap;
 	
 	public String names(int index) {
 		return names.get(index);
@@ -17,6 +19,13 @@ public class VariableListDeclaration extends Declaration {
 		super(firstToken);
 		this.type = type;
 		this.names = names;
+		slotmap = new HashMap<>();
+	}
+	public int getSlot(String name) {
+		return slotmap.get(name);
+	}
+	public void setSlot(String name, int slot) {
+		slotmap.put(name, new Integer(slot));
 	}
 
 	@Override

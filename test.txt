@@ -1,27 +1,7 @@
-boolean a;
-int b, x, y;
-char c;
-float d, t;
-string e;
-
-a = true;
-B = 10;
-c = 'a';
-d = 23.2;
-e = "Hello, World!";
-
-a = 1+2;
-d = 2.12 - 1;
-a == 3;
-a = 1 + 2 * 4.5;
-t = (1+2) * 4.5;
-t = (((4-2)*5.6)/3)+2;
-
-int score = 100;
-
-if (a == 100) {
-    print ("Value of a is 100");
-}
-if (score > 100) {
-    print (a);
+testProgram{
+	float a;
+	boolean c = true;
+	if (c) {
+		a = float(3 + 3.1);
+	};
 }
